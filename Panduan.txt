@@ -1,0 +1,25 @@
+============================================================
+       TERIMA KASIH TELAH BERBELANJA DI DHS STUDIO
+          "Premium Admin Dashboard Solution"
+============================================================
+
+Template "DHS Admin Dashboard Pro" ini siap membantu 
+mempercepat pengerjaan sistem Anda.
+
+------------------------------------------------------------
+CARA MODIFIKASI:
+------------------------------------------------------------
+1. EDIT ANGKA STATISTIK: Cari teks angka (seperti $12,000) 
+   di index.html dan ganti sesuai data Anda.
+2. EDIT MENU SIDEBAR: Cari bagian <nav> atau <ul> untuk 
+   mengubah nama-nama menu di samping.
+3. EDIT GRAFIK: Cari bagian <script> di bawah file untuk 
+   menyesuaikan data pada Chart.
+
+------------------------------------------------------------
+BUTUH SETUP CUSTOM?
+------------------------------------------------------------
+Jika Anda butuh bantuan integrasi data atau ingin menambah 
+fitur khusus di dashboard ini, hubungi Admin DHS Studio:
+[082184268075]
+============================================================

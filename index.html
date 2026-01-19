@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Admin Dashboard - Analytics</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        slate: {
+                            850: '#1e293b', // Custom dark shade
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-indigo-50/30 text-slate-800 font-sans antialiased dark:bg-slate-900 dark:text-slate-200 transition-colors duration-300">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay"
+        class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar Navigation (Sticky) -->
+        <aside id="sidebar"
+            class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-full shadow-2xl lg:shadow-none">
+
+            <!-- Logo -->
+            <div class="flex items-center justify-between h-20 px-8 border-b border-slate-100 dark:border-slate-700/50">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Nexus<span
+                            class="text-indigo-600">Admin</span></span>
+                </div>
+                <button id="close-sidebar"
+                    class="lg:hidden p-1 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1.5">
+                <a href="#"
+                    class="group flex items-center px-4 py-3.5 text-sm font-medium rounded-2xl bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 transition-all">
+                    <i data-lucide="pie-chart" class="w-5 h-5 mr-3.5 text-indigo-600 dark:text-indigo-400"></i>
+                    Dashboard
+                </a>
+
+                <a href="#"
+                    class="group flex items-center px-4 py-3.5 text-sm font-medium rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all">
+                    <i data-lucide="shopping-bag"
+                        class="w-5 h-5 mr-3.5 text-slate-400 group-hover:text-indigo-500 dark:text-slate-500 dark:group-hover:text-indigo-400 transition-colors"></i>
+                    Orders
+                </a>
+
+                <a href="#"
+                    class="group flex items-center px-4 py-3.5 text-sm font-medium rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all">
+                    <i data-lucide="users"
+                        class="w-5 h-5 mr-3.5 text-slate-400 group-hover:text-indigo-500 dark:text-slate-500 dark:group-hover:text-indigo-400 transition-colors"></i>
+                    Customers
+                </a>
+
+                <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-700/50 px-2">
+                    <span class="px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Settings</span>
+                </div>
+
+                <a href="#"
+                    class="group flex items-center px-4 py-3.5 text-sm font-medium rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all">
+                    <i data-lucide="settings"
+                        class="w-5 h-5 mr-3.5 text-slate-400 group-hover:text-indigo-500 dark:text-slate-500 dark:group-hover:text-indigo-400 transition-colors"></i>
+                    General
+                </a>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="border-t border-slate-100 dark:border-slate-700 p-6">
+                <div
+                    class="flex items-center p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
+                    <img class="h-10 w-10 rounded-xl object-cover"
+                        src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        alt="Admin">
+                    <div class="ml-3 overflow-hidden">
+                        <p class="text-sm font-bold text-slate-800 dark:text-white truncate">DHS Admin</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 truncate">SaaS Manager</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50/50 dark:bg-slate-900">
+
+            <!-- Top Header -->
+            <header
+                class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 h-20 flex items-center justify-between px-4 sm:px-8 z-20 sticky top-0">
+                <div class="flex items-center flex-1">
+                    <button id="open-sidebar"
+                        class="lg:hidden mr-4 p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+
+                    <div class="relative w-full max-w-md hidden sm:block group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search"
+                                class="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                        </div>
+                        <input type="text"
+                            class="block w-full pl-10 pr-3 py-2.5 border-0 rounded-2xl leading-5 bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                            placeholder="Search analytics...">
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button id="theme-toggle"
+                        class="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors">
+                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                    </button>
+
+                    <button
+                        class="relative p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span
+                            class="absolute top-2.5 right-2.5 block h-2 w-2 rounded-full ring-2 ring-white dark:ring-slate-800 bg-rose-500"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-8">
+                <div class="max-w-7xl mx-auto space-y-8">
+
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+                            <p class="text-slate-500 dark:text-slate-400 mt-1">Overview of your store's performance.</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button
+                                class="flex items-center px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
+                            </button>
+                            <button
+                                class="flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-105 active:scale-95">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add Product
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Card 1 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Revenue</p>
+                                    <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">$84,254</h3>
+                                </div>
+                                <div
+                                    class="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl text-indigo-600 dark:text-indigo-400">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span
+                                    class="text-emerald-500 flex items-center font-medium bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg">
+                                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> 28.4%
+                                </span>
+                                <span class="ml-2 text-slate-400">vs last month</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Users</p>
+                                    <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">1,234</h3>
+                                </div>
+                                <div class="p-3 bg-sky-50 dark:bg-sky-500/10 rounded-xl text-sky-600 dark:text-sky-400">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span
+                                    class="text-emerald-500 flex items-center font-medium bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg">
+                                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> 12.1%
+                                </span>
+                                <span class="ml-2 text-slate-400">vs last month</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Orders</p>
+                                    <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">856</h3>
+                                </div>
+                                <div
+                                    class="p-3 bg-orange-50 dark:bg-orange-500/10 rounded-xl text-orange-600 dark:text-orange-400">
+                                    <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span
+                                    class="text-rose-500 flex items-center font-medium bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-lg">
+                                    <i data-lucide="trending-down" class="w-4 h-4 mr-1"></i> 2.4%
+                                </span>
+                                <span class="ml-2 text-slate-400">vs last month</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Conversion Rate
+                                    </p>
+                                    <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">3.2%</h3>
+                                </div>
+                                <div
+                                    class="p-3 bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-xl text-fuchsia-600 dark:text-fuchsia-400">
+                                    <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span
+                                    class="text-emerald-500 flex items-center font-medium bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg">
+                                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> 8.7%
+                                </span>
+                                <span class="ml-2 text-slate-400">vs last month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <!-- Line Chart: Sales Analytics -->
+                        <div
+                            class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Sales Analytics</h3>
+                                <select
+                                    class="bg-slate-50 dark:bg-slate-700 border-none text-sm rounded-lg focus:ring-indigo-500 text-slate-600 dark:text-slate-300 p-2">
+                                    <option>This Year</option>
+                                    <option>Last Year</option>
+                                </select>
+                            </div>
+                            <div class="relative h-80 w-full">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Doughnut Chart: Traffic Sources -->
+                        <div
+                            class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Traffic Sources</h3>
+                                <button
+                                    class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm font-medium">View
+                                    Report</button>
+                            </div>
+                            <div class="relative h-64 w-full flex justify-center">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
+                            <!-- Legend -->
+                            <div class="mt-6 space-y-3">
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full bg-indigo-600 mr-2"></span>
+                                        <span class="text-slate-600 dark:text-slate-400">Direct</span>
+                                    </div>
+                                    <span class="font-medium text-slate-900 dark:text-white">55%</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full bg-sky-500 mr-2"></span>
+                                        <span class="text-slate-600 dark:text-slate-400">Social Media</span>
+                                    </div>
+                                    <span class="font-medium text-slate-900 dark:text-white">30%</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600 mr-2"></span>
+                                        <span class="text-slate-600 dark:text-slate-400">Referral</span>
+                                    </div>
+                                    <span class="font-medium text-slate-900 dark:text-white">15%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div
+                        class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div
+                            class="p-6 border-b border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Transactions</h3>
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Filter</button>
+                                <button
+                                    class="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition">Export</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-slate-500 uppercase bg-slate-50/50 dark:bg-slate-700/20">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold">Order ID</th>
+                                        <th class="px-6 py-4 font-semibold">Customer</th>
+                                        <th class="px-6 py-4 font-semibold">Date</th>
+                                        <th class="px-6 py-4 font-semibold">Amount</th>
+                                        <th class="px-6 py-4 font-semibold">Status</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                                    <!-- Row 1 -->
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-indigo-600 dark:text-indigo-400">#ORD-001
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <img class="h-8 w-8 rounded-full object-cover mr-3"
+                                                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    alt="">
+                                                <span class="font-medium text-slate-900 dark:text-white">Alice
+                                                    Freeman</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">Jan 12, 2026</td>
+                                        <td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">$1,200.00
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                                Success
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i
+                                                    data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 2 -->
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-indigo-600 dark:text-indigo-400">#ORD-002
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold mr-3">
+                                                    JD</div>
+                                                <span class="font-medium text-slate-900 dark:text-white">John Doe</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">Jan 11, 2026</td>
+                                        <td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">$850.00</td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                                                Pending
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i
+                                                    data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 3 -->
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-indigo-600 dark:text-indigo-400">#ORD-003
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <img class="h-8 w-8 rounded-full object-cover mr-3"
+                                                    src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    alt="">
+                                                <span class="font-medium text-slate-900 dark:text-white">Michael
+                                                    Smith</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">Jan 10, 2026</td>
+                                        <td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">$2,100.00
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-400">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>
+                                                Cancelled
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i
+                                                    data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JavaScript Bundle -->
+    <script>
+        // --- Initialization ---
+        lucide.createIcons();
+
+        // --- Theme Logic ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = themeToggleBtn.querySelector('.lucide-moon');
+        const lightIcon = themeToggleBtn.querySelector('.lucide-sun');
+
+        function setIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                darkIcon.style.display = 'none'; // logic swapped in HTML class, correcting here
+                // Note: The HTML has 'hidden' classes that do the work, so we might not need manual display toggling if DOM is correct.
+                // Let's rely on CSS classes (hidden block) which are robust.
+            }
+        }
+
+        // --- Sidebar Logic ---
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                mobileOverlay.classList.remove('hidden');
+                setTimeout(() => mobileOverlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mobileOverlay.classList.add('opacity-0');
+                setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        openSidebarBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        mobileOverlay.addEventListener('click', toggleSidebar);
+
+        // --- Chart.js Configuration ---
+
+        // Define colors
+        const colors = {
+            indigo: { default: '#4f46e5', dark: '#6366f1' },
+            sky: { default: '#0ea5e9', dark: '#38bdf8' },
+            slate: { default: '#cbd5e1', dark: '#475569' },
+            grid: { light: '#f1f5f9', dark: '#334155' },
+            text: { light: '#64748b', dark: '#94a3b8' }
+        };
+
+        let salesChartInstance = null;
+        let trafficChartInstance = null;
+
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return {
+                primary: isDark ? colors.indigo.dark : colors.indigo.default,
+                secondary: isDark ? colors.sky.dark : colors.sky.default,
+                tertiary: isDark ? colors.slate.dark : colors.slate.default,
+                grid: isDark ? colors.grid.dark : colors.grid.light,
+                text: isDark ? colors.text.dark : colors.text.light,
+                tooltipBg: isDark ? '#1e293b' : '#ffffff',
+                tooltipText: isDark ? '#f8fafc' : '#0f172a'
+            };
+        }
+
+        function initCharts() {
+            const chartColors = getChartColors();
+
+            // 1. Sales Analytics (Line Chart)
+            const ctxSales = document.getElementById('salesChart').getContext('2d');
+
+            // Create Gradient
+            let gradient = ctxSales.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, chartColors.primary + '50'); // 50% opacity
+            gradient.addColorStop(1, chartColors.primary + '00'); // 0% opacity
+
+            // DATA_EDIT_AREA: Change numbers here for Sales Chart
+            const salesData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [12000, 19000, 15000, 25000, 22000, 30000, 28000, 35000, 45000, 42000, 55000, 60000], // EDIT ME
+                    borderColor: chartColors.primary,
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: chartColors.primary,
+                    pointHoverBackgroundColor: chartColors.primary,
+                    pointHoverBorderColor: '#ffffff',
+                    fill: true,
+                    tension: 0.4 // Smooth curve
+                }]
+            };
+
+            salesChartInstance = new Chart(ctxSales, {
+                type: 'line',
+                data: salesData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: chartColors.tooltipBg,
+                            titleColor: chartColors.tooltipText,
+                            bodyColor: chartColors.tooltipText,
+                            borderColor: chartColors.grid,
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.grid, borderDash: [5, 5] },
+                            ticks: { color: chartColors.text, font: { family: 'Inter' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.text, font: { family: 'Inter' } }
+                        }
+                    },
+                    animation: {
+                        y: { duration: 2000, easing: 'easeOutQuart' }
+                    }
+                }
+            });
+
+            // 2. Traffic Sources (Doughnut Chart)
+            const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+
+            // DATA_EDIT_AREA: Change numbers here for Traffic Chart
+            const trafficData = {
+                labels: ['Direct', 'Social Media', 'Referral'],
+                datasets: [{
+                    data: [55, 30, 15], // EDIT ME
+                    backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.tertiary],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            };
+
+            trafficChartInstance = new Chart(ctxTraffic, {
+                type: 'doughnut',
+                data: trafficData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%', // Thinner ring
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: chartColors.tooltipBg,
+                            bodyColor: chartColors.tooltipText,
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+        // --- Dark Mode & Chart Update ---
+        function updateCharts() {
+            if (!salesChartInstance || !trafficChartInstance) return;
+
+            const newColors = getChartColors();
+
+            // Update Sales Chart
+            const ctxSales = document.getElementById('salesChart').getContext('2d');
+            let gradient = ctxSales.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, newColors.primary + '50');
+            gradient.addColorStop(1, newColors.primary + '00');
+
+            salesChartInstance.data.datasets[0].borderColor = newColors.primary;
+            salesChartInstance.data.datasets[0].pointBorderColor = newColors.primary;
+            salesChartInstance.data.datasets[0].pointHoverBackgroundColor = newColors.primary;
+            salesChartInstance.data.datasets[0].backgroundColor = gradient;
+            salesChartInstance.options.scales.y.grid.color = newColors.grid;
+            salesChartInstance.options.scales.y.ticks.color = newColors.text;
+            salesChartInstance.options.scales.x.ticks.color = newColors.text;
+            salesChartInstance.options.plugins.tooltip.backgroundColor = newColors.tooltipBg;
+            salesChartInstance.options.plugins.tooltip.titleColor = newColors.tooltipText;
+            salesChartInstance.options.plugins.tooltip.bodyColor = newColors.tooltipText;
+            salesChartInstance.options.plugins.tooltip.borderColor = newColors.grid;
+            salesChartInstance.update();
+
+            // Update Traffic Chart
+            trafficChartInstance.data.datasets[0].backgroundColor = [newColors.primary, newColors.secondary, newColors.tertiary];
+            trafficChartInstance.options.plugins.tooltip.backgroundColor = newColors.tooltipBg;
+            trafficChartInstance.options.plugins.tooltip.bodyColor = newColors.tooltipText;
+            trafficChartInstance.update();
+        }
+
+        // Toggle Theme Event
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+            } else {
+                localStorage.theme = 'light';
+            }
+            updateCharts();
+        });
+
+        // Initialize
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Wait for fonts/styles before drawing charts to ensure correct colors/sizes
+        window.addEventListener('load', initCharts);
+
+    </script>
+</body>
+
+</html>
